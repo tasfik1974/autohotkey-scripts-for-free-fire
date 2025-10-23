@@ -1,0 +1,102 @@
+#Persistent
+#SingleInstance Force
+#NoTrayIcon       ; Tray icon লুকানো
+#KeyHistory 0     ; কোনো key history সংরক্ষণ করবে না
+SetBatchLines, -1 ; সর্বোচ্চ পারফরম্যান্স
+ListLines, Off    ; কমান্ড লগ বন্ধ
+
+;-------------------------------------
+; Variable initialization
+;-------------------------------------
+toggle := false      ; স্ক্রিপ্ট অন/অফ
+mode := 1            ; ডিফল্ট মোড
+delay := 50          ; বিলম্ব (ms)
+F11Loop := false     ; F11 লুপ চলছে কিনা
+
+;-------------------------------------
+; Numpad + চাপলে স্ক্রিপ্ট টগল + NumLock টগল
+;-------------------------------------
+NumpadAdd::
+    toggle := !toggle
+    SetNumLockState, % toggle ? "On" : "Off"
+return
+
+;-------------------------------------
+; Mode change (Speed change)
+;-------------------------------------
+Numpad1::
+    if (toggle) {
+        mode := 1
+        delay := 50
+    }
+return
+
+Numpad2::
+    if (toggle) {
+        mode := 2
+        delay := 100
+    }
+return
+
+Numpad3::
+    if (toggle) {
+        mode := 3
+        delay := 200
+    }
+return
+
+Numpad4::
+    if (toggle) {
+        mode := 4
+        delay := 300
+    }
+return
+
+Numpad5::
+    if (toggle) {
+        mode := 5
+        delay := 500
+    }
+return
+
+;-------------------------------------
+; মাউস লেফট বাটন ধরে রাখলে → F11 লুপ শুরু
+;-------------------------------------
+~LButton::
+    if (!toggle)
+        return
+    F11Loop := true
+    SetTimer, SendF11, %delay%
+return
+
+;-------------------------------------
+; মাউস লেফট বাটন ছেড়ে দিলে → F11 লুপ বন্ধ + F10 পাঠানো
+;-------------------------------------
+~LButton Up::
+    if (!toggle)
+        return
+    F11Loop := false
+    SetTimer, SendF11, Off
+    Send, {F10}
+return
+
+;-------------------------------------
+; F11 পাঠানোর লুপ
+;-------------------------------------
+SendF11:
+    if (F11Loop)
+        Send, {F11}
+return
+
+;-------------------------------------
+; Numpad - চাপলে স্ক্রিপ্ট সম্পূর্ণ বন্ধ (Task end)
+;-------------------------------------
+NumpadSub::
+    Process, Close, %A_ScriptFullPath%
+    ExitApp
+return
+
+;-------------------------------------
+; Optional: Manual exit key (Ctrl+End)
+;-------------------------------------
+^End::ExitApp
