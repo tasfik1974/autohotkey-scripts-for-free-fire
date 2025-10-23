@@ -1,0 +1,42 @@
+#NoEnv
+SendMode Input
+SetWorkingDir %A_ScriptDir%
+#NoTrayIcon  ; আইকন লুকানো থাকবে
+
+; interval in milliseconds between F11 sends when holding X2
+interval := 5
+
+; When XButton2 is pressed, start a repeating timer
+XButton2::
+    SetTimer, SendF11, %interval%
+return
+
+; When XButton2 is released, stop the timer and send one F10
+XButton2 Up::
+    SetTimer, SendF11, Off
+    Send {F10}
+return
+
+; Timer label: send F11 only if the button is still physically down
+SendF11:
+    if GetKeyState("XButton2", "P")
+    {
+        Send {F11}
+    }
+    else
+    {
+        ; safety: stop timer if somehow still running
+        SetTimer, SendF11, Off
+    }
+return
+
+
+; =============================
+; 🔴 NumPad Minus = End Script
+; =============================
+NumpadSub::
+{
+    Process, Close, %A_ScriptFullPath%   ; বর্তমান AutoHotkey প্রক্রিয়া বন্ধ করবে
+    ExitApp                              ; Script exit হবে
+}
+return
